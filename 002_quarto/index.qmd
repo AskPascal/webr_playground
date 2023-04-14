@@ -6,6 +6,82 @@ filters:
 - webr
 ---
 
+```{ojs}
+//| echo: false
+//| output: false
+
+function delay(time) {
+  return new Promise(resolve => setTimeout(resolve, time));
+}
+
+
+async function wait_and_click() {
+  console.log('waiting for webr');
+  await globalThis.webR.init();
+  await delay(100);
+  // document.getElementById("webr-run-button-1").click();
+
+  // Do some math
+  globalThis.webR.evalRVoid("a <- 1 + 1")
+
+  console.log('clicking');  
+  // click all buttons
+  document.querySelectorAll(".btn-webr").forEach((btn) => {
+    btn.click()
+  });  
+  return(true);
+}
+
+wait_and_click()
+
+```
+
+```{=html}
+<input type="file" id="input" multiple />
+```
+
+```{ojs}
+//| echo: false
+//| output: false
+
+webR.evalRVoid("download.file('https://rud.is/data/webr-packages.json', 'webr-packages.json')");
+
+
+inputElement = document.getElementById("input");
+inputElement.addEventListener("change", handleFiles, false);
+function handleFiles() {
+  const fileList = this.files; /* now you can work with the file list */
+  console.log(fileList);
+  for (let i = 0; i < fileList.length; i++) {
+    const file = fileList[i];
+    FileUpload(file)
+  }
+}
+
+function FileUpload(file) {
+  const reader = new FileReader();
+  console.log(file.name);
+  //await webR.FS.writeFile("test.csv", reader.readAsBinaryString(file));
+  reader.onload = (evt) => {
+    console.log(evt);
+    console.log(file.name);
+    console.log(evt.target.result.length);
+    var x = evt.target.result;
+    console.log(x.byteLength);
+    var enc = new TextDecoder("utf-8");
+    console.log(enc.decode(x))
+    globalThis.webR.FS.writeFile(file.name, enc.decode(x));
+  };  
+  reader.readAsArrayBuffer(file);  
+}
+```
+
+
 ```{webr}
-1 + 1
+file.info(dir())
+
+# Read Text File as String
+text_file <- 'glue_manifest.csv'
+file_str = readChar(text_file, file.info(text_file)$size)
+file_str
 ```
