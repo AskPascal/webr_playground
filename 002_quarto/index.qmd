@@ -70,7 +70,8 @@ function FileUpload(file) {
     console.log(x.byteLength);
     var enc = new TextDecoder("utf-8");
     console.log(enc.decode(x))
-    globalThis.webR.FS.writeFile(file.name, enc.decode(x));
+    var uint8View = new Uint8Array(x);
+    globalThis.webR.FS.writeFile(file.name, uint8View);
   };  
   reader.readAsArrayBuffer(file);  
 }
